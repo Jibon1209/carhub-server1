@@ -30,6 +30,9 @@ async function run() {
     const database = client.db("usersDB");
     const userCollection = database.collection("users");
 
+    const productCollection = client.db('productDB').collection('products');
+
+    // user api
     app.get('/users',async(req,res)=>{
         const cursor = userCollection.find()
         const result = await cursor.toArray();
@@ -38,7 +41,6 @@ async function run() {
 
     app.post('/users', async(req,res)=>{
         const user = req.body;
-        console.log('new user', user);
         const result = await userCollection.insertOne(user);
         res.send(result);
     });
@@ -55,6 +57,26 @@ async function run() {
         res.send(result);
       })
 
+
+      //add product api
+      app.get('/products',async(req,res)=>{        
+        const cursor = productCollection.find();
+        const result = await cursor.toArray();
+        res.send(result);
+      })
+
+      app.get('/products/:brnd',async(req,res)=>{
+        const brnd = req.params.brnd;
+        const query = {brand: brnd}
+        const result = await productCollection.find(query).toArray();
+        res.send(result);
+      })
+
+      app.post('/products', async(req,res)=>{
+        const newproduct = req.body;
+        const result = await productCollection.insertOne(newproduct);
+        res.send(result);
+    });
 
 
     // Send a ping to confirm a successful connection
