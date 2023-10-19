@@ -27,10 +27,14 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
 
-        const database = client.db("usersDB");
+        // userCollection
+        const database = client.db("productDB");
         const userCollection = database.collection("users");
-
+        // productCollection
         const productCollection = client.db('productDB').collection('products');
+
+        // cartCollection
+        const cartCollection = client.db('productDB').collection('carts');
 
         // user api
         app.get('/users', async (req, res) => {
@@ -98,6 +102,33 @@ async function run() {
             const result = await productCollection.updateOne(filter, Product, option);
             res.send(result);
         })
+
+        // carts Api
+        app.get('/carts', async (req, res) => {
+            const cursor = cartCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+        app.get('/carts/:id',async(req,res)=>{
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)}
+            const result = await cartCollection.findOne(query);
+            res.send(result);
+          })
+
+        app.post('/carts', async (req, res) => {
+            const addToCare = req.body;
+            const result = await cartCollection.insertOne(addToCare);
+            res.send(result);
+        });
+        
+        app.delete('/carts/:id',async(req,res)=>{
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)}
+            const result = await cartCollection.deleteOne(query);
+            res.send(result);
+      
+          })
 
 
         // Send a ping to confirm a successful connection
